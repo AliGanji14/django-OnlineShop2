@@ -10,7 +10,7 @@ class UserManager(BaseUserManager):
         if not full_name:
             raise ValueError('user must have full name')
 
-        user = self.moddel(phone_number=phone_number, email=self.normalize_email(email), full_name=full_name)
+        user = self.model(phone_number=phone_number, email=self.normalize_email(email), full_name=full_name)
         user.set_password(password)
         user.save(using=self.db)
         return user
