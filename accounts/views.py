@@ -2,19 +2,20 @@ import random
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib import messages
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login, logout
 
-from .forms import UserRegisterForm, VerifyCodeForm
+from .forms import UserRegisterForm, VerifyCodeForm, UserLoginForm
 from .models import OtpCode
 from utils import send_otp_code
 
 
 class UserRegisterView(View):
     form_class = UserRegisterForm
+    template_name = 'accounts/register.html'
 
     def get(self, request):
         form = self.form_class
-        return render(request, 'accounts/register.html', {'form': form})
+        return render(request, self.template_name, {'form': form})
 
     def post(self, request):
         form = self.form_class(request.POST)
@@ -37,7 +38,7 @@ class UserRegisterView(View):
             }
             messages.success(request, 'we sent you a code', 'success')
             return redirect('accounts:verify_code')
-        return redirect('home:home')
+        return render(request, self.template_name, {'form': form})
 
 
 class UserRegisterVerifyCodeView(View):
@@ -54,6 +55,10 @@ class UserRegisterVerifyCodeView(View):
         form = self.form_class(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
+            if code_instance.is_expired():
+                messages.error(request, 'The code has expired. Please request a new code.', 'danger')
+                code_instance.delete()
+                return redirect('accounts:user_register')
             if cd['code'] == code_instance.code:
                 get_user_model().objects.create_user(
                     phone_number=user_session['phone_number'],
@@ -67,4 +72,32 @@ class UserRegisterVerifyCodeView(View):
             else:
                 messages.error(request, 'this code is wrong', 'danger')
                 return redirect('accounts:verify_code')
+        return render(request, 'accounts/verify.html', {'form': form})
+
+
+class UserLogoutView(View):
+    def get(self, request):
+        logout(request)
+        messages.success(request, 'you logged out successfully', 'success')
         return redirect('home:home')
+
+
+class UserLoginView(View):
+    form_class = UserLoginForm
+    template_name = 'accounts/login.html'
+
+    def get(self, request):
+        form = self.form_class
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            user = authenticate(request, phone_number=cd['phone'], password=cd['password'])
+            if user is not None:
+                login(request, user)
+                messages.success(request, 'you logged in successfully', 'info')
+                return redirect('home:home')
+            messages.error(request, 'phone or password is wrong', 'warning')
+        return render(request, self.template_name, {'form': form})

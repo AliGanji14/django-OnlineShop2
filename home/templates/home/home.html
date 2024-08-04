@@ -1,5 +1,5 @@
 {% extends '_base.html' %}
 
 {% block content %}
-    <h3>Hello User</h3>
+    <h3>Hello User {{ request.user.full_name }}</h3>
 {% endblock %}
