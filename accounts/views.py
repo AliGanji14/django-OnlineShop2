@@ -79,7 +79,7 @@ class UserLogoutView(View):
     def get(self, request):
         logout(request)
         messages.success(request, 'you logged out successfully', 'success')
-        return redirect('home:home')
+        return redirect('shop:product_list')
 
 
 class UserLoginView(View):
@@ -98,6 +98,6 @@ class UserLoginView(View):
             if user is not None:
                 login(request, user)
                 messages.success(request, 'you logged in successfully', 'info')
-                return redirect('home:home')
+                return redirect('shop:product_list')
             messages.error(request, 'phone or password is wrong', 'warning')
         return render(request, self.template_name, {'form': form})
