@@ -21,5 +21,4 @@ class ProductDetailView(View):
         product = get_object_or_404(Product, slug=slug)
         return render(request, 'shop/detail.html', {'product': product, 'form': form})
 
-    def post(self, request, pk):
-        pass
+

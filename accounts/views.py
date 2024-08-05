@@ -50,14 +50,13 @@ class UserRegisterVerifyCodeView(View):
 
     def post(self, request):
         user_session = request.session['user_registration_info']
-        code_instance = OtpCode.objects.get(phone_number=user_session['phone_number'])
+        code_instance = OtpCode.objects.filter(phone_number=user_session['phone_number']).last()
 
         form = self.form_class(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
             if code_instance.is_expired():
                 messages.error(request, 'The code has expired. Please request a new code.', 'danger')
-                code_instance.delete()
                 return redirect('accounts:user_register')
             if cd['code'] == code_instance.code:
                 get_user_model().objects.create_user(
@@ -66,9 +65,8 @@ class UserRegisterVerifyCodeView(View):
                     full_name=user_session['full_name'],
                     password=user_session['password']
                 )
-                code_instance.delete()
                 messages.success(request, 'you registered successfully', 'success')
-                return redirect('home:home')
+                return redirect('shop:product_list')
             else:
                 messages.error(request, 'this code is wrong', 'danger')
                 return redirect('accounts:verify_code')

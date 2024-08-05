@@ -4,4 +4,8 @@
 {% block content %}
     <h3>Checkout</h3>
     <p>Total: {{ order.get_total_price }}</p>
+    <form action="{% url 'orders:order_pay' order.id %}" method="post">
+        {% csrf_token %}
+        <input class="btn btn-primary" type="submit" value="Pay">
+    </form>
 {% endblock %}
