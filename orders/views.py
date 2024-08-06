@@ -3,7 +3,7 @@ import json
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
 
 from shop.models import Product
@@ -18,7 +18,9 @@ class CartView(View):
         return render(request, 'orders/cart.html', {'cart': cart})
 
 
-class CartAddView(View):
+class CartAddView(PermissionRequiredMixin, View):
+    permission_required = 'orders.add_order'
+
     def post(self, request, product_id):
         cart = Cart(request)
         product = get_object_or_404(Product, pk=product_id)
