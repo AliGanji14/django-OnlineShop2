@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'shop.apps.ShopConfig',
     'orders.apps.OrdersConfig',
+    'ckeditor'
 ]
 
 MIDDLEWARE = [
@@ -129,3 +130,4 @@ AUTH_USER_MODEL = 'accounts.User'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
