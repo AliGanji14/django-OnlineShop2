@@ -4,8 +4,14 @@
 {% block content %}
     <h3>Checkout</h3>
     <p>Total: {{ order.get_total_price }}</p>
-    <form action="{% url 'orders:order_pay' order.id %}" method="post">
+    <form action="{% url 'orders:order_pay' order.id %}" method="post" novalidate>
         {% csrf_token %}
         <input class="btn btn-primary" type="submit" value="Pay">
+    </form>
+    <br><br>
+    <form action="{% url 'orders:apply_coupon' order.id %}" method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Apply">
     </form>
 {% endblock %}
